@@ -12,8 +12,8 @@ from mms_api.apiviews import (ContainerAPI,
                               CompanyWithdrawsAPI,
                               CompanyDepositAPI,
                               WithdrawCreateAPI,WithdrawsReportAPI,DepositsReportAPI,
-                              WithdrawTypeAPI,CreateWithdrawTypeAPI,
-CompanySupervisorAPI
+                              WithdrawTypeAPI,CreateWithdrawTypeAPI,CompanyTypeAPI,
+CompanySupervisorAPI,InvoiceAPI,BuildingCalcAPI,WorkerCalcAPI
                               )
 from core.serializers import CustomUserSerializer
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
@@ -51,9 +51,7 @@ urlpatterns = [
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     # mms api
-    path('containers/', ContainerAPI.as_view(), name="ContainerAPI"),
-    path('companies/', CompaniesListAPI.as_view(), name="list companies"),
-    path('company_create/', CompanyCreateAPI.as_view(), name="create company"),
+
     path('deposits/', DepositAPI.as_view(), name="deposits"),
     path('create_deposit/', DepositCreateAPI.as_view(), name="create deposit"),
     path('withdraws/', WithdrawAPI.as_view(), name="withdraw"),
@@ -62,13 +60,27 @@ urlpatterns = [
     path('create_withdraw/', WithdrawCreateAPI.as_view(), name="create withdraw"),
     path('withdraw_types/', WithdrawTypeAPI.as_view(), name="fetch all withdraw types"),
     path('create_withdraw_type/', CreateWithdrawTypeAPI.as_view(), name="create withdraw type"),
+    # building calc apis
+    path('create_building_calc/',BuildingCalcAPI.as_view(),name="create bulding calc"),
+    path('get_all_building_calc/',BuildingCalcAPI.as_view(), name="get all building calc api"),
 
+    # worker calc apis
+    path('create_worker_calc/', WorkerCalcAPI.as_view(), name="create worker calc"),
+    path('get_all_worker_calc/', WorkerCalcAPI.as_view(), name="get all worker calc"),
+    # invoices
+    path('create_invoice/', InvoiceAPI.as_view(), name="create invoice"),
+    path('invoices/', InvoiceAPI.as_view(), name="get all invoices"),
+    # containers
+    path('containers/', ContainerAPI.as_view(), name="ContainerAPI"),
     path('container_deposits/<uuid:pk>', ContainerDepositAPI.as_view(), name="container deposits"),
     path('container_withdraws/<uuid:pk>', ContainerWithdrawsAPI.as_view(), name="container withdraws"),
+    # company
     path('company_deposits/<uuid:pk>', CompanyDepositAPI.as_view(), name="container deposits"),
     path('company_withdraws/<uuid:pk>', CompanyWithdrawsAPI.as_view(), name="container withdraws"),
     path('company_supervisor/<int:pk>', CompanySupervisorAPI.as_view(), name="company supervisor"),
-
+    path('company_type/', CompanyTypeAPI.as_view(), name="fetch all company_type "),
+    path('companies/', CompaniesListAPI.as_view(), name="list companies"),
+    path('company_create/', CompanyCreateAPI.as_view(), name="create company"),
     # login
     path('login/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

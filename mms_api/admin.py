@@ -1,7 +1,41 @@
 from django.contrib import admin
 from .models import (Deposit, Withdraw, WithdrawType,
-                     Company, Container)
+                     Company, Container, Personal, CompanyType,
+                     Invoice,BuildingCalc,WorkerCalc)
 from django.utils.html import format_html
+
+
+@admin.register(CompanyType)
+class CompanyTypeAdmin(admin.ModelAdmin):
+    list_display = ['id', 'title', ]
+
+    def get_actions(self, request):
+        actions = super(CompanyTypeAdmin, self).get_actions(request)
+        print(actions)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
+
+
+@admin.register(Personal)
+class PersonalAdmin(admin.ModelAdmin):
+    def formatted_total_price_dinar(self, obj):
+        return format_html(f"IQD {obj.total_dinar:,.0f}")
+
+    def formatted_total_price_dollar(self, obj):
+        return format_html(f"$ {obj.total_dollar:,.0f}")
+
+    formatted_total_price_dinar.short_description = 'Total Dinar'  # Sets the column header
+    formatted_total_price_dollar.short_description = 'Total Dollar'  # Sets the column header
+    list_display = ['title', 'container', 'formatted_total_price_dinar',
+                    'formatted_total_price_dollar', 'created_at', 'created_by']
+
+    def get_actions(self, request):
+        actions = super(PersonalAdmin, self).get_actions(request)
+        print(actions)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
 
 
 @admin.register(Company)
@@ -14,7 +48,7 @@ class CompanyAdmin(admin.ModelAdmin):
 
     formatted_total_price_dinar.short_description = 'Total Dinar'  # Sets the column header
     formatted_total_price_dollar.short_description = 'Total Dollar'  # Sets the column header
-    list_display = ['title', 'container', 'formatted_total_price_dinar',
+    list_display = ['title', 'company_type', 'container', 'formatted_total_price_dinar',
                     'formatted_total_price_dollar', 'supervisor', 'created_at', 'created_by']
 
     def get_actions(self, request):
@@ -76,7 +110,6 @@ class DepositAdmin(admin.ModelAdmin):
         'formatted_price_dinar', 'formatted_price_dollar',
         'description', 'received_from', 'record_created_at',
         'created_at', 'created_by']
-
 
     # def get_queryset(self, request):
     #     qs = super().get_queryset(request)
@@ -142,7 +175,48 @@ class WithdrawTypeAdmin(admin.ModelAdmin):
             del actions['delete_selected']
         return actions
 
-# @admin.register(LogEntry)
-# class LogEntryAdmin(admin.ModelAdmin):
-#     list_display = ['timestamp', 'user',
-#                     'action', 'details', 'model_affected','record_id']
+
+@admin.register(Invoice)
+class InvoiceAdmin(admin.ModelAdmin):
+
+    def formatted_price_dinar(self, obj):
+        return format_html(f"IQD {obj.price_in_dinar:,.0f}")
+
+    def formatted_price_dollar(self, obj):
+        return format_html(f"$ {obj.price_in_dollar:,.0f}")
+
+    formatted_price_dinar.short_description = 'Total Dinar'  # Sets the column header
+
+    formatted_price_dollar.short_description = 'Total Dollar'  # Sets the column header
+
+    list_display = ['id', 'invoice_id','title', 'description', 'created_at']
+
+
+@admin.register(BuildingCalc)
+class BuildingCalcAdmin(admin.ModelAdmin):
+
+    def formatted_price_dinar(self, obj):
+        return format_html(f"IQD {obj.price_in_dinar:,.0f}")
+
+    def formatted_price_dollar(self, obj):
+        return format_html(f"$ {obj.price_in_dollar:,.0f}")
+
+    formatted_price_dinar.short_description = 'Total Dinar'  # Sets the column header
+
+    formatted_price_dollar.short_description = 'Total Dollar'  # Sets the column header
+
+    list_display = ['id', 'invoice_id','title', 'description', 'created_at']
+@admin.register(WorkerCalc)
+class WorkerCalcAdmin(admin.ModelAdmin):
+
+    def formatted_price_dinar(self, obj):
+        return format_html(f"IQD {obj.price_in_dinar:,.0f}")
+
+    def formatted_price_dollar(self, obj):
+        return format_html(f"$ {obj.price_in_dollar:,.0f}")
+
+    formatted_price_dinar.short_description = 'Total Dinar'  # Sets the column header
+
+    formatted_price_dollar.short_description = 'Total Dollar'  # Sets the column header
+
+    list_display = ['id', 'invoice_id','title', 'description', 'created_at']

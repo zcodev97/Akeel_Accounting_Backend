@@ -21,7 +21,18 @@ class Container(models.Model):
         verbose_name_plural = 'القاصات'
 
 
-class Company(models.Model):
+class CompanyType(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    title = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name_plural = 'نوع الشركة'
+
+
+class Personal(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255, unique=True)
     container = models.ForeignKey(Container, on_delete=models.CASCADE)
@@ -29,7 +40,21 @@ class Company(models.Model):
     total_dollar = models.FloatField()
     created_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    supervisor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE , related_name='supervisor')
+
+    class Meta:
+        verbose_name_plural = 'خاص'
+
+
+class Company(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    title = models.CharField(max_length=255, unique=True)
+    container = models.ForeignKey(Container, on_delete=models.CASCADE)
+    total_dinar = models.FloatField()
+    total_dollar = models.FloatField()
+    company_type = models.ForeignKey(CompanyType, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    supervisor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='supervisor')
 
     def __str__(self):
         return self.title
@@ -61,7 +86,7 @@ class Deposit(models.Model):
     created_at = models.DateTimeField()
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='created_by_user')
     record_created_at = models.DateTimeField(auto_now=True)
-    deposit_number = models.PositiveIntegerField(blank=True,unique=True)   # New field
+    deposit_number = models.PositiveIntegerField(blank=True, unique=True)  # New field
     document = models.FileField(upload_to='withdraw_documents/', blank=True, null=True)
 
     # @classmethod
@@ -74,7 +99,6 @@ class Deposit(models.Model):
     class Meta:
         verbose_name_plural = 'الايداعات'
 
-
     def generate_invoice_id(self):
         # Customize the prefix or length as needed
         prefix = "INV"
@@ -84,7 +108,7 @@ class Deposit(models.Model):
     def save(self, *args, **kwargs):
 
         old_price_in_dinar = 0
-        old_price_in_dollar =  0
+        old_price_in_dollar = 0
         # Retrieve the existing data before update
         try:
             old_instance = Deposit.objects.get(pk=self.pk)
@@ -93,8 +117,6 @@ class Deposit(models.Model):
         except Deposit.DoesNotExist:
             # If the instance does not exist yet, set old_instance to None
             old_instance = None
-
-
 
         if not self.deposit_number:  # Only generate deposit_number if not set
             last_deposit = Deposit.objects.order_by('-deposit_number').first()
@@ -114,7 +136,7 @@ class Deposit(models.Model):
                 self.company_name.total_dinar += self.price_in_dinar
                 self.company_name.total_dollar += self.price_in_dollar
 
-            else :
+            else:
                 if old_price_in_dollar > self.price_in_dollar:
                     temp_price_dollar = old_price_in_dollar - self.price_in_dollar
                     self.container.total_dollar -= temp_price_dollar
@@ -124,7 +146,6 @@ class Deposit(models.Model):
                     temp_price_dollar = self.price_in_dollar - old_price_in_dollar
                     self.container.total_dollar += temp_price_dollar
                     self.company_name.total_dollar += temp_price_dollar
-
 
                 if old_price_in_dinar > self.price_in_dinar:
                     temp_price_dinar = old_price_in_dinar - self.price_in_dinar
@@ -169,7 +190,7 @@ class Withdraw(models.Model):
     record_created_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
                                    related_name='created_by_withdrawer')
-    withdraw_number = models.PositiveIntegerField(blank=True,unique=True)  # New field
+    withdraw_number = models.PositiveIntegerField(blank=True, unique=True)  # New field
     document = models.FileField(upload_to='withdraw_documents/', blank=True, null=True)
 
     def __str__(self):
@@ -187,7 +208,7 @@ class Withdraw(models.Model):
     def save(self, *args, **kwargs):
 
         old_price_in_dinar = 0
-        old_price_in_dollar =  0
+        old_price_in_dollar = 0
         # Retrieve the existing data before update
         try:
             old_instance = Withdraw.objects.get(pk=self.pk)
@@ -253,6 +274,78 @@ class Withdraw(models.Model):
                 self.container.save()
                 self.company_name.save()
             super().delete(using=using, keep_parents=keep_parents)
+
+
+class Invoice(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    invoice_id = models.CharField(max_length=10, unique=True, editable=False)
+    title = models.CharField(max_length=255)
+    description = models.JSONField()
+    created_at = models.DateTimeField(auto_now=True)
+
+    def generate_invoice_id(self):
+        # Customize the prefix or length as needed
+        prefix = "#"
+        unique_id = str(uuid.uuid4().int)[:6]  # Extract 6 characters from the UUID
+        return f"{prefix}{unique_id}"
+
+    def save(self, *args, **kwargs):
+        with transaction.atomic():
+            if not self.invoice_id:
+                # Generate a short and secure invoice ID
+                self.invoice_id = self.generate_invoice_id()
+            super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title
+
+
+class BuildingCalc(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    invoice_id = models.CharField(max_length=10, unique=True, editable=False)
+    title = models.CharField(max_length=255)
+    description = models.JSONField()
+    created_at = models.DateTimeField(auto_now=True)
+
+    def generate_invoice_id(self):
+        # Customize the prefix or length as needed
+        prefix = "#"
+        unique_id = str(uuid.uuid4().int)[:6]  # Extract 6 characters from the UUID
+        return f"{prefix}{unique_id}"
+
+    def save(self, *args, **kwargs):
+        with transaction.atomic():
+            if not self.invoice_id:
+                # Generate a short and secure invoice ID
+                self.invoice_id = self.generate_invoice_id()
+            super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title
+
+
+class WorkerCalc(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    invoice_id = models.CharField(max_length=10, unique=True, editable=False)
+    title = models.CharField(max_length=255)
+    description = models.JSONField()
+    created_at = models.DateTimeField(auto_now=True)
+
+    def generate_invoice_id(self):
+        # Customize the prefix or length as needed
+        prefix = "#"
+        unique_id = str(uuid.uuid4().int)[:6]  # Extract 6 characters from the UUID
+        return f"{prefix}{unique_id}"
+
+    def save(self, *args, **kwargs):
+        with transaction.atomic():
+            if not self.invoice_id:
+                # Generate a short and secure invoice ID
+                self.invoice_id = self.generate_invoice_id()
+            super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title
 
 
 # class EndpointLog(models.Model):

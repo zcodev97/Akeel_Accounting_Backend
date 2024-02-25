@@ -5,14 +5,45 @@ from rest_framework.response import Response
 from rest_framework import generics, status
 from django.contrib.auth import authenticate
 from django.shortcuts import get_object_or_404
-from .models import Container, Company, Deposit, Withdraw, WithdrawType
+from .models import (Container, Company, Deposit,
+                     Withdraw, WithdrawType,CompanyType,Invoice,BuildingCalc,WorkerCalc)
 from .serializers import (ContainerSerializer,
                           CompanySerializer, CompanyCreateSerializer,
                           DepositSerializer, DepositCreateSerializer,
-                          WithdrawSerializer, WithdrawCreateSerializer, WithdrawTypeSerializer)
+                          WithdrawSerializer, WithdrawCreateSerializer,
+                          WithdrawTypeSerializer,
+                          CompanyTypeSerializer,
+                          InvoiceSerializer,WorkerCalcSerializer,
+                          BuildingCalcSerializer)
 from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.conf import settings
+
+
+class WorkerCalcAPI(generics.ListCreateAPIView):
+    queryset = WorkerCalc.objects.all()
+    serializer_class = WorkerCalcSerializer
+    permission_classes = [IsAuthenticated, DjangoModelPermissions]
+
+
+
+class BuildingCalcAPI(generics.ListCreateAPIView):
+    queryset = BuildingCalc.objects.all()
+    serializer_class = BuildingCalcSerializer
+    permission_classes = [IsAuthenticated, DjangoModelPermissions]
+
+
+class InvoiceAPI(generics.ListCreateAPIView):
+    queryset = Invoice.objects.all()
+    serializer_class = InvoiceSerializer
+    permission_classes = [IsAuthenticated, DjangoModelPermissions]
+
+
+
+class CompanyTypeAPI(generics.ListCreateAPIView):
+    queryset = CompanyType.objects.all()
+    serializer_class = CompanyTypeSerializer
+    permission_classes = [IsAuthenticated, DjangoModelPermissions]
 
 
 class ContainerAPI(generics.ListCreateAPIView):

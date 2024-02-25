@@ -1,15 +1,42 @@
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 from django.conf import settings
-from .models import Container, Company, Deposit, Withdraw, WithdrawType
+from .models import (Container, Company, Deposit,
+                     Withdraw, WithdrawType, CompanyType,
+                     BuildingCalc, WorkerCalc,
+                     Invoice)
 
 from core.serializers import CustomUserSerializer
+
+
+class WorkerCalcSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WorkerCalc
+        fields = ('invoice_id', 'title', 'description', 'created_at')
+
+
+class BuildingCalcSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BuildingCalc
+        fields = ('invoice_id', 'title', 'description', 'created_at')
+
+
+class InvoiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Invoice
+        fields = ('invoice_id', 'title', 'description', 'created_at')
 
 
 class ContainerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Container
         fields = ('id', 'name', 'total_dinar', 'total_dollar', 'created_at', 'created_by')
+
+
+class CompanyTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CompanyType
+        fields = ('id', 'title')
 
 
 class WithdrawTypeSerializer(serializers.ModelSerializer):
@@ -20,17 +47,21 @@ class WithdrawTypeSerializer(serializers.ModelSerializer):
 
 class CompanySerializer(serializers.ModelSerializer):
     container = ContainerSerializer()
+    supervisor = CustomUserSerializer()
+    company_type = CompanyTypeSerializer()
 
     class Meta:
         model = Company
-        fields = ['id', 'title', 'container', 'total_dinar','supervisor',
+        fields = ['id', 'company_type', 'title',
+                  'container', 'total_dinar', 'supervisor',
                   'total_dollar', 'created_by', 'created_at', 'created_by']
 
 
 class CompanyCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
-        fields = ['title', 'container','supervisor', 'total_dinar', 'total_dollar', 'created_by']
+        fields = ['title', 'company_type', 'container',
+                  'supervisor', 'total_dinar', 'total_dollar', 'created_by']
 
 
 class DepositSerializer(serializers.ModelSerializer):
@@ -39,9 +70,9 @@ class DepositSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Deposit
-        fields = ['invoice_id','deposit_number', 'container', 'company_name', 'price_in_dollar',
+        fields = ['invoice_id', 'deposit_number', 'container', 'company_name', 'price_in_dollar',
                   'price_in_dinar', 'description',
-                  'received_from', 'created_at']
+                  'received_from', 'created_at', 'document']
 
 
 class DepositCreateSerializer(serializers.ModelSerializer):
@@ -49,7 +80,7 @@ class DepositCreateSerializer(serializers.ModelSerializer):
         model = Deposit
         fields = ['invoice_id', 'container', 'company_name', 'price_in_dollar',
                   'price_in_dinar', 'description',
-                  'received_from', 'created_at', 'created_by']
+                  'received_from', 'created_at', 'created_by', 'document']
 
 
 class WithdrawSerializer(serializers.ModelSerializer):
