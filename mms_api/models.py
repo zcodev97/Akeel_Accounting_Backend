@@ -29,7 +29,7 @@ class CompanyType(models.Model):
         return self.title
 
     class Meta:
-        verbose_name_plural = 'نوع الشركة'
+        verbose_name_plural = 'انواع المشاريع'
 
 
 class Personal(models.Model):
@@ -60,7 +60,7 @@ class Company(models.Model):
         return self.title
 
     class Meta:
-        verbose_name_plural = 'الشركات'
+        verbose_name_plural = 'المشاريع'
 
 
 class WithdrawType(models.Model):
@@ -298,7 +298,9 @@ class Invoice(models.Model):
 
     def __str__(self):
         return self.title
-
+    
+    class Meta:
+        verbose_name_plural = 'الفواتير'
 
 class BuildingCalc(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -324,6 +326,10 @@ class BuildingCalc(models.Model):
         return self.title
 
 
+    class Meta:
+        verbose_name_plural = 'ذرعات البنايات'
+
+
 class WorkerCalc(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     invoice_id = models.CharField(max_length=10, unique=True, editable=False)
@@ -346,7 +352,8 @@ class WorkerCalc(models.Model):
 
     def __str__(self):
         return self.title
-
+    class Meta:
+        verbose_name_plural = 'ذرعات الخلفات'
 
 # class EndpointLog(models.Model):
 #     user = models.ForeignKey(settings.AUTH_USER_MODEL,

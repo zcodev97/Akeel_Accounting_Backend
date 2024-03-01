@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 from datetime import timedelta
+import os
 from pathlib import Path
 
 from django.conf import settings
@@ -25,6 +26,12 @@ SECRET_KEY = 'django-insecure-wdpmw9i_&2ih06avn%p#qv922jv^6=%(owc&b1*ary0wjqi$f2
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATIC_URL = '/static/'
+
 
 ALLOWED_HOSTS = ['*']
 
@@ -47,6 +54,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -81,24 +89,24 @@ WSGI_APPLICATION = 'mms.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
-
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'mms',
-#         'USER': 'postgres',
-#         'PASSWORD': 'zakria',
-#         'HOST': 'localhost',  # Set to the address of your database
-#         'PORT': '5432',  # The default port PostgreSQL listens on
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
+
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'mms',
+        'USER': 'postgres',
+        'PASSWORD': 'arabsmeet.com',
+        'HOST': 'localhost',  # Set to the address of your database
+        'PORT': '5432',  # The default port PostgreSQL listens on
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -157,7 +165,7 @@ SPECTACULAR_SETTINGS = {
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+ 
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
