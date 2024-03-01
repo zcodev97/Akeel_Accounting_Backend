@@ -62,6 +62,18 @@ class Company(models.Model):
     class Meta:
         verbose_name_plural = 'المشاريع'
 
+class CompanyType1(Company):
+    class Meta:
+        proxy = True
+        verbose_name = 'شخصي'
+        verbose_name_plural = 'شخصي'
+
+class CompanyType2(Company):
+    class Meta:
+        proxy = True
+        verbose_name = 'المشاريع'
+        verbose_name_plural = 'المشاريع'
+
 
 class WithdrawType(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -275,6 +287,17 @@ class Withdraw(models.Model):
                 self.company_name.save()
             super().delete(using=using, keep_parents=keep_parents)
 
+class WithdrawType1(Withdraw):
+    class Meta:
+        proxy = True
+        verbose_name = 'صرفيات الشركة'
+        verbose_name_plural = 'صرفيات الشركة'
+
+class WithdrawType2(Withdraw):
+    class Meta:
+        proxy = True
+        verbose_name = 'صرفيات المشاريع'
+        verbose_name_plural = 'صرفيات المشاريع'
 
 class Invoice(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

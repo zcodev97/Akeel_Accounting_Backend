@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     'mms_api',
     'core',
     'drf_spectacular',
+    'easyaudit',
+
 ]
 
 MIDDLEWARE = [
@@ -62,6 +64,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+     'easyaudit.middleware.easyaudit.EasyAuditMiddleware',
     # 'mms_api.middleware.LoggingMiddleware',
 
 ]
